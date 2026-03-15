@@ -23,6 +23,7 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
+
 logger = logging.getLogger(__name__)
 
 def run():
