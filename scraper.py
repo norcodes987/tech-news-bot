@@ -26,11 +26,7 @@ logger = logging.getLogger(__name__)
 
 # Reddit blocks requests with no User-Agent header.
 # This is a polite identifier string — no credentials needed.
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Accept": "application/json, text/html, */*",
-    "Accept-Language": "en-US,en;q=0.9",
-}
+HEADERS = {"User-Agent": "tech-news-bot/1.0 (personal project)"}
 
 # Be polite to Reddit's servers — wait between each subreddit request
 REQUEST_DELAY_SECONDS = 2
@@ -47,7 +43,7 @@ def build_url(subreddit: str) -> str:
         Full JSON endpoint URL, e.g.
         "https://www.reddit.com/r/MachineLearning/hot.json?limit=10"
     """
-    base = f"https://old.reddit.com/r/{subreddit}/{POST_SORT_BY}.json"
+    base = f"https://www.reddit.com/r/{subreddit}/{POST_SORT_BY}.json"
     params = f"?limit={POSTS_PER_SUBREDDIT}"
 
     # "top" sort supports a time filter (day/week/month etc.)
