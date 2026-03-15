@@ -1,10 +1,10 @@
 # =============================================================================
 # main.py — Bot Orchestrator
 # =============================================================================
-#   1. Scrape posts from all configured subreddits (no login needed)
-#   2. Categorize each post
+#   1. Fetch posts from Reddit (no login needed)
+#   2. Categorize each post by keyword
 #   3. Deduplicate against previous runs
-#   4. Export to a date-stamped CSV
+#   4. Send a formatted HTML digest email via Gmail
 #
 # Usage:
 #   python main.py
@@ -12,9 +12,10 @@
 
 import logging
 import sys
+from emailer import send_email
 from scraper import fetch_posts
 from categorizer import categorize_posts
-from exporter import export_to_csv
+from exporter import deduplicate_posts, load_seen_urls, save_seen_urls
 
 logging.basicConfig(
     level=logging.INFO,
@@ -53,20 +54,29 @@ def run():
     # ------------------------------------------------------------------
     categorized_posts = categorize_posts(raw_posts)
     # ------------------------------------------------------------------
-    # STEP 3 + 4: Deduplicate and export to CSV
+    # STEP 3: Deduplicate
     # ------------------------------------------------------------------
-    output_path = export_to_csv(categorized_posts)
+     # load seen URLs and deduplicate
+    seen_urls = load_seen_urls()
+    fresh_posts, new_urls = deduplicate_posts(categorized_posts, seen_urls)
+    if not fresh_posts:
+        logger.info("All posts were duplicates from previous runs. Nothing new to export.")
+        return ""
+    
     # ------------------------------------------------------------------
-    # DONE
+    # Step 4: Send email
     # ------------------------------------------------------------------
-    if output_path:
+    success = send_email(fresh_posts)
+    # Only save seen URLs if email sent successfully
+    # This way if the email fails, we'll retry those posts tomorrow
+    if success:
+        save_seen_urls(new_urls)
         logger.info("=" * 60)
-        logger.info(f"Run complete. CSV saved to: {output_path}")
+        logger.info(f"Done. Email sent with {len(fresh_posts)} posts.")
         logger.info("=" * 60)
     else:
-        logger.info("Run complete. No new posts to export today.")
+        logger.info("Email failed - seen_urls not updated. Will retry tomorrow")
  
-    return output_path
  
  
 if __name__ == "__main__":

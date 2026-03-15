@@ -118,3 +118,22 @@ CATEGORIES = {
 OUTPUT_DIR      = "output"           # Folder to save CSVs into (created automatically)
 OUTPUT_PREFIX   = "tech_news"        # Prefix for the CSV filename
 DEDUPE_LOG_FILE = "seen_urls.txt"    # Tracks URLs already seen to avoid duplicates across days
+
+# -----------------------------------------------------------------------------
+# EMAIL SETTINGS
+# -----------------------------------------------------------------------------
+# The bot sends a daily HTML digest email via Gmail's SMTP server.
+#
+# How to get a Gmail App Password (required — Google blocks regular passwords):
+# 1. Go to https://myaccount.google.com/security
+# 2. Make sure 2-Step Verification is turned ON
+# 3. Search "App passwords" in the search bar at the top
+# 4. Click App passwords → create one named "reddit-bot"
+# 5. Google will show you a 16-character password — paste it below
+#
+# IMPORTANT: Never commit this file to a public GitHub repo with real credentials.
+# Use environment variables for GitHub Actions (instructions in README.md)
+GMAIL_SENDER    = "automationupdates396@gmail.com"
+GMAIL_APP_PASS  = "usqh hicu prvc oksq"
+EMAIL_RECIPIENT = "automationupdates396@gmail.com"
+EMAIL_SUBJECT   = "🗞️ Your Daily Tech Digest"

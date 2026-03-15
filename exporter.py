@@ -91,69 +91,6 @@ def deduplicate_posts(posts: list[dict], seen_urls: set) -> tuple[list[dict], se
     return filtered_posts, new_urls
 
 
-# =============================================================================
-# CSV EXPORT
-# =============================================================================
-
-def get_output_filepath() -> str:
-    """
-    Generates a date-stamped file path for today's CSV.
- 
-    Example output: "output/tech_news_2026-03-11.csv"
- 
-    Returns:
-        Full relative file path as a string.
-    """
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    filename = f"{OUTPUT_PREFIX}_{today}.csv"
-    return os.path.join(OUTPUT_DIR, filename)
-
- 
-def export_to_csv(posts: list[dict]) -> str:
-    """
-    Main export function. Handles deduplication and writes a sorted CSV.
- 
-    The CSV is sorted by category first, then by score (highest first)
-    so it reads like a clean report when you open it.
- 
-    Args:
-        posts: List of categorized post dicts from categorizer.
- 
-    Returns:
-        The file path of the written CSV, or empty string if nothing to export.
-    """
-    if not posts:
-        logger.warning("No posts to export.")
-        return ""
-    
-    # load seen URLs and deduplicate
-    seen_urls = load_seen_urls()
-    fresh_posts, new_urls = deduplicate_posts(posts, seen_urls)
-
-    if not fresh_posts:
-        logger.info("All posts were duplicates from previous runs. Nothing new to export.")
-        return ""
-    
-    # sort posts - by category alphabetically, then by score descending
-    fresh_posts.sort(key=lambda p: (p["category"], -p["score"]))
-
-    # create output directory if it dosen't exist
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-    # write to csv
-    filepath = get_output_filepath()
-
-    with open(filepath, "w", newline="", encoding="utf-8") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=CSV_COLUMNS, extrasaction="ignore")
-        writer.writeheader()
-        writer.writerows(fresh_posts)
-    logger.info(f"CSV exported: {filepath} ({len(fresh_posts)} posts)")
-
-    # save seen urls to dedupe log so tomorrow's run skios them
-    save_seen_urls(new_urls)
-    return filepath
-
-
 if __name__ == "__main__":
     # Usage: python exporter.py
     test_posts = [
@@ -181,5 +118,3 @@ if __name__ == "__main__":
         },
     ]
  
-    output_path = export_to_csv(test_posts)
-    print(f"\nTest CSV written to: {output_path}")
