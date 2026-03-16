@@ -10,7 +10,7 @@ from config import CATEGORIES
 
 logger = logging.getLogger(__name__)
 
-def categorize_post(title: str) -> str:
+def categorize_post(title: str, categories: dict = None) -> str:
     """
     Assigns a category to a single post based on its title.
 
@@ -35,14 +35,15 @@ def categorize_post(title: str) -> str:
     """
     title_lower = title.lower()
 
-    for category, keywords in CATEGORIES.items():
+    active_categories = categories if categories is not None else CATEGORIES
+    for category, keywords in active_categories.items():
         for keyword in keywords:
             if keyword.lower() in title_lower:
                 return category
 
     return "General"
 
-def categorize_posts(posts: list[dict]) -> list[dict]:
+def categorize_posts(posts: list[dict], categories: dict = None) -> list[dict]:
     """
         Runs categorize_post() on every post in the list and adds
         a "category" field to each post dict.
@@ -58,7 +59,7 @@ def categorize_posts(posts: list[dict]) -> list[dict]:
     category_counts = {}
     
     for post in posts:
-        category = categorize_post(post["title"])
+        category = categorize_post(post["title"], categories=categories)
         post["category"] = category
 
         category_counts[category] = category_counts.get(category, 0) + 1

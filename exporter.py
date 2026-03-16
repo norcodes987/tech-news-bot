@@ -30,7 +30,7 @@ CSV_COLUMNS = [
 # DEDUPLICATION
 # =============================================================================
 
-def load_seen_urls() -> set:
+def load_seen_urls(dedupe_file: str = None) -> set:
     """
     Loads the set of Reddit URLs we've already exported in previous runs.
     If the log file doesn't exist yet (first run), returns an empty set.
@@ -38,7 +38,8 @@ def load_seen_urls() -> set:
     Returns:
         A set of URL strings we've previously exported.
     """
-    if not os.path.exists(DEDUPE_LOG_FILE):
+    filepath = dedupe_file if dedupe_file else DEDUPE_LOG_FILE
+    if not os.path.exists(filepath):
         logger.info("No dedupe log found - this looks like the fist run.")
         return set()
     
@@ -48,7 +49,7 @@ def load_seen_urls() -> set:
     logger.info(f"Loaded {len(urls)} previously seen URLs from dedupe log.")
     return urls
 
-def save_seen_urls(urls: set) -> None:
+def save_seen_urls(urls: set, dedupe_file: str = None) -> None:
     """
     Saves the updated set of seen URLs back to the log file.
     Appends new URLs to the existing log (doesn't overwrite).
@@ -56,7 +57,8 @@ def save_seen_urls(urls: set) -> None:
     Args:
         urls: Set of new URL strings to add to the log.
     """
-    with open(DEDUPE_LOG_FILE, "a") as f:
+    filepath = dedupe_file if dedupe_file else DEDUPE_LOG_FILE
+    with open(filepath, "a") as f:
         for url in urls:
             f.write(url + "\n")
     logger.info(f"Saved {len(urls)} new URLs to dedupe log")

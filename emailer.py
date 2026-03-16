@@ -33,6 +33,13 @@ CATEGORY_EMOJI = {
     "Security":     "🔒",
     "Hardware":     "⚙️",
     "General":      "📌",
+    "Personal Finance": "💳",
+    "Investing":    "📈",
+    "Stock Market": "📊",
+    "FIRE":         "🔥",
+    "Singapore Finance":    "🇸🇬",
+    "Crypto":       "₿",
+    "Macro & Economy":  "🌍"
 }
 
 
@@ -195,7 +202,7 @@ def build_email_html(posts: list[dict]) -> str:
 # EMAIL SENDER
 # =============================================================================
 
-def send_email(posts: list[dict]) -> bool:
+def send_email(posts: list[dict], subject: str = None) -> bool:
     """
     Builds and sends the HTML digest email via Gmail SMTP.
 
@@ -220,7 +227,7 @@ def send_email(posts: list[dict]) -> bool:
 
     # Set up the email message
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = EMAIL_SUBJECT
+    msg["Subject"] = subject if subject else EMAIL_SUBJECT
     msg["From"]    = GMAIL_SENDER
     msg["To"]      = EMAIL_RECIPIENT
 

@@ -1,14 +1,15 @@
 # =============================================================================
-# main.py — Bot Orchestrator
+# main_finance.py — Finance Bot Orchestrator
 # =============================================================================
-#   1. Fetch posts from tech subreddits
-#   2. Categorize by tech keywords
+# Runs the finance news pipeline:
+#   1. Fetch posts from finance subreddits
+#   2. Categorize by finance keywords
 #   3. Deduplicate against previous runs
 #   4. Send HTML digest email
 #
 # Usage:
-#   python main.py
-# Task Scheduler: runs daily at 7:00 AM
+#   python main_finance.py
+# Task Scheduler: runs daily at 8:00 AM
 # =============================================================================
 
 import logging
@@ -17,7 +18,7 @@ from emailer import send_email
 from scraper import fetch_posts
 from categorizer import categorize_posts
 from exporter import deduplicate_posts, load_seen_urls, save_seen_urls
-from config import TECH_SUBREDDITS, TECH_CATEGORIES, TECH_DEDUPE_FILE, TECH_EMAIL_SUBJECT
+from config import FINANCE_SUBREDDITS, FINANCE_CATEGORIES, FINANCE_DEDUPE_FILE, FINANCE_EMAIL_SUBJECT
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,7 +37,7 @@ def run():
         Send email
     """
     logger.info("=" * 60)
-    logger.info("Reddit Tech News Bot — Starting run")
+    logger.info("Reddit Finance News Bot — Starting run")
     logger.info("=" * 60)
  
     # ------------------------------------------------------------------
@@ -44,23 +45,23 @@ def run():
     # No credentials needed — uses public JSON endpoints
     # ------------------------------------------------------------------
     try:
-        raw_posts = fetch_posts(subreddits=TECH_SUBREDDITS)
+        raw_posts = fetch_posts(subreddits=FINANCE_SUBREDDITS)
     except Exception as e:
         logger.error(f"Failed to fetch posts: {e}")
         sys.exit(1)
  
     if not raw_posts:
-        logger.warning("No posts were fetched. Check subreddit names in config.py.")
+        logger.warning("No posts were fetched. Check finance_subreddits in config.py.")
         return ""
     # ------------------------------------------------------------------
     # STEP 2: Categorize each post
     # ------------------------------------------------------------------
-    categorized_posts = categorize_posts(raw_posts, categories=TECH_CATEGORIES)
+    categorized_posts = categorize_posts(raw_posts, categories=FINANCE_CATEGORIES)
     # ------------------------------------------------------------------
     # STEP 3: Deduplicate
     # ------------------------------------------------------------------
      # load seen URLs and deduplicate
-    seen_urls = load_seen_urls(TECH_DEDUPE_FILE)
+    seen_urls = load_seen_urls(FINANCE_DEDUPE_FILE)
     fresh_posts, new_urls = deduplicate_posts(categorized_posts, seen_urls)
     if not fresh_posts:
         logger.info("All posts were duplicates from previous runs. Nothing new to export.")
@@ -69,11 +70,11 @@ def run():
     # ------------------------------------------------------------------
     # Step 4: Send email
     # ------------------------------------------------------------------
-    success = send_email(fresh_posts, subject=TECH_EMAIL_SUBJECT)
+    success = send_email(fresh_posts, subject=FINANCE_EMAIL_SUBJECT)
     # Only save seen URLs if email sent successfully
     # This way if the email fails, we'll retry those posts tomorrow
     if success:
-        save_seen_urls(new_urls, TECH_DEDUPE_FILE)
+        save_seen_urls(new_urls, FINANCE_DEDUPE_FILE)
         logger.info("=" * 60)
         logger.info(f"Done. Email sent with {len(fresh_posts)} posts.")
         logger.info("=" * 60)
@@ -84,3 +85,4 @@ def run():
  
 if __name__ == "__main__":
     run()
+

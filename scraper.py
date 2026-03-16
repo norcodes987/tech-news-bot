@@ -11,7 +11,6 @@ import logging
 import time
 from datetime import datetime, timezone
 from config import (
-    SUBREDDITS,
     POSTS_PER_SUBREDDIT,
     POST_SORT_BY,
     TIME_FILTER,
@@ -53,7 +52,7 @@ def build_url(subreddit: str) -> str:
     return base + params
 
 
-def fetch_posts() -> list[dict]:
+def fetch_posts(subreddits: list[str] = None) -> list[dict]:
     """
     Fetches posts from all subreddits defined in config.SUBREDDITS.
 
@@ -73,7 +72,8 @@ def fetch_posts() -> list[dict]:
     """
     all_posts = []
 
-    for subreddit in SUBREDDITS:
+    active_subreddits = subreddits if subreddits is not None else SUBREDDITS
+    for subreddit in active_subreddits:
         url = build_url(subreddit)
 
         try:

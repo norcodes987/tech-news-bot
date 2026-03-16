@@ -11,8 +11,8 @@ config.py           # Contains Gmail credentials and bot settings
 # -----------------------------------------------------------------------------
 # BOT RUNTIME FILES — generated automatically, no need to track
 # -----------------------------------------------------------------------------
-seen_urls.txt       # Deduplication log — local to each machine
-output/             # Daily CSV files
+seen_urls_finance.txt       # Deduplication log — local to each machine
+seen_urls_.tech.txt       # Deduplication log — local to each machine
 
 # -----------------------------------------------------------------------------
 # PYTHON
